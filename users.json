@@ -1,0 +1,44 @@
+[
+    {
+        "id": 1,
+        "name": "Juuso Korhonen",
+        "username": "korho",
+        "role": "admin",
+        "keys": "https://github.com/korhox.keys"
+    },
+    {
+        "id": 2,
+        "name": "Niko Nevalainen",
+        "username": "Jauska",
+        "role": "admin",
+        "keys": "https://github.com/Jauska.keys"
+    },
+    {
+        "id": 3,
+        "name": "Patrick Lagerkrans",
+        "username": "paatu",
+        "role": "admin",
+        "keys": "https://github.com/lagerkrans.keys"
+    },
+    {
+        "id": 4,
+        "name": "Mikko Salonen",
+        "username": "mikkosalo",
+        "role": "admin",
+        "keys": "https://github.com/Random67839.keys"
+    },
+    {
+        "id": 5,
+        "name": "Touko Litola",
+        "username": "tlitola",
+        "role": "admin",
+        "keys": "https://github.com/tlitola.keys"
+    },
+    {
+        "id": 6,
+        "name": "Patrik Tuominen",
+        "username": "newbNox",
+        "role": "operator",
+        "keys": "https://github.com/newbNox.keys"
+    }
+]
