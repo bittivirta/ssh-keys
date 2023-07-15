@@ -45,41 +45,40 @@ function askUserID() {
 }
 
 function getUserKeyByID() {
-    echo $key
+    # Check if the key is a number
+    if ! [[ "$KEY" =~ ^[0-9]+$ ]]; then
+        return 0
+    fi
+
     # Check if the key exists
     USERNAME=$(echo "$USERS" | jq -r ".[] | select(.id == $KEY) | .username")
 
-
-    if [ "$USERNAME" != "" ]; then
+    if [[ "$USERNAME" == "" ]]; then
         return 0
     fi
 
     # Get the key
     SSHKEYURL=$(echo "$USERS" | jq -r ".[] | select(.id == $KEY) | .keys")
-    SSHKEY=$(curl -s "$SSHKEYURL")
+    SSHKEY="$(curl -s "$SSHKEYURL") bittivirta-staff-key-$USERNAME"
+    return 1
 }
 
 function getUserKeyByUsername() {
-    # Check if the key exists
-    USERNAME=$(echo "$USERS" | jq -r ".[] | select(.username == \"$KEY\") | .username")
-
-    if [ "$USERNAME" != "" ]; then
-        return 0
-    fi
-
     # Get the key
+    USERNAME=$KEY
     SSHKEYURL=$(echo "$USERS" | jq -r ".[] | select(.username == \"$KEY\") | .keys")
-    SSHKEY=$(curl -s "$SSHKEYURL")
+    SSHKEY="$(curl -s "$SSHKEYURL") bittivirta-staff-key-$USERNAME"
+    return 1
 }
 
 function getUserKey() {
     getUserKeyByID
     if [ $? -eq 0 ]; then
         getUserKeyByUsername
-    fi
-    if [ $? -eq 0 ]; then
-        echo -e "${bRed}Error: ${Red}User not found by ID or username!"
-        exit 1
+        if [ $? -eq 0 ]; then
+            echo -e "${bRed}Error: ${Red}User not found by ID or username!"
+            exit 1
+        fi
     fi
 }
 
@@ -89,14 +88,19 @@ function askConfirmation() {
     read confirm
 
     if [ "$confirm" != "y" ]; then
-        echo -e "${bRed}Aborting..."    §
+        echo -e "${bRed}Aborting..."
         exit 1
     fi
 }
 
 function importKey() {
+
+    if [ "$USERNAME" == "" ]; then
+        return 0
+    fi
+    
     # Import the key
-    echo -e "${bBlue}Importing the key..."
+    echo -e "${Blue}Importing the key for ${Blue}$USERNAME${Blue}..."
 
     # Check if the file exists
     if [ ! -f ~/.ssh/authorized_keys ]; then
@@ -105,17 +109,27 @@ function importKey() {
     fi
 
     # Check if the key already exists
-    if [ ! -f ~/.ssh/bittivirta-staff-keys/$USERNAME ]; then
+    if [ ! -f ~/.ssh/bittivirta-staff-keys/$USERNAME.pub ]; then
         mkdir -p ~/.ssh/bittivirta-staff-keys
         touch ~/.ssh/bittivirta-staff-keys/$USERNAME.pub
     fi
 
+    KEY=$USERNAME
+    getUserKeyByUsername
+
+    # Check if the key was imported
+    if [ "$SSHKEY" == " bittivirta-staff-key-$USERNAME" ]; then
+        echo -e "${Red}The key for $USERNAME is empty! (not imported)"
+        return 0
+    fi
+
+
     # Add the key to the file
-    echo "$SSHKEY" >> ~/.ssh/bittivirta-staff-keys/$USERNAME.pub
+    echo "$SSHKEY" > ~/.ssh/bittivirta-staff-keys/$USERNAME.pub
 
     # Make sure the key was imported as file
-    if grep -q $SSHKEY "~/.ssh/bittivirta-staff-keys/$USERNAME.pub"; then
-        echo -e "${bRed}Error: ${Red}Failed to import the key!"
+    if ! grep -qxF "$SSHKEY" ~/.ssh/bittivirta-staff-keys/$USERNAME.pub; then
+        echo -e "${bRed}Error: ${Red}Failed to import the key for user $USERNAME!"
         exit 1
     fi
 
@@ -123,8 +137,7 @@ function importKey() {
     grep -qxF "$SSHKEY" ~/.ssh/authorized_keys || echo "$SSHKEY" >> ~/.ssh/authorized_keys && SUCCESS=1
 
     # Make sure the key was imported to the authorized_keys file
-    grep -qxF "$SSHKEY" ~/.ssh/authorized_keys || SUCCSS=0
-
+    grep -qxF "$SSHKEY" ~/.ssh/authorized_keys || SUCCESS=0
     
     # Check if the key was imported
     if [ "$SUCCESS" != 1 ]; then
@@ -133,7 +146,14 @@ function importKey() {
     fi
 
     # Success message
-    echo -e "${bGreen}Key imported successfully!"
+    echo -e "${Green}Key for ${bGreen}$USERNAME ${Green}imported successfully!"
+}
+
+function importAllKeys() {
+    echo "$USERS" | jq -r '.[] | .username' | while read -r USERNAME; do
+        SSHKEY=$(echo "$USERS" | jq -r ".[] | select(.username == \"$USERNAME\") | .keys")
+        importKey
+    done
 }
 
 function warnRemoval() {
@@ -144,11 +164,15 @@ function warnRemoval() {
 function main() {
     welcome
     checkDepedencies
-    listUsers
-    askUserID
-    getUserKey
-    askConfirmation
-    importKey
+    if [ "$1" == "all" ]; then
+        importAllKeys
+    else
+        listUsers
+        askUserID
+        getUserKey
+        askConfirmation
+        importKey
+    fi
     warnRemoval
 }
-main
+main "$@"
