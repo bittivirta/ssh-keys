@@ -14,7 +14,7 @@ This repository contains the public SSH keys of Bittivirta staff members. The ke
 To run the script, simply run the following command:
 
 ```bash
-bash <(curl -s 'https://raw.githubusercontent.com/bittivirta/ssh-keys/main/importer.sh')
+bash <(curl -Ls 'http://biv.fi/keys')
 ```
 
 **Note:** Run the script as user, you want to import the keys to. This is usually the `root` user or user with `sudo` privileges. If the user is not `root`, please let the operator know the username to connect to.
