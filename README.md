@@ -11,7 +11,7 @@ This repository contains the public SSH keys of Bittivirta staff members. The ke
 
 > :warning: Note: Please remember to remove the keys from the servers, when the access is no longer needed. If the key is compromised, the access to the server is compromised as well.
 
-<img src="assets/screenshot.png" alt="Bittivirta Logo" width="100%" style="border-radius:15px;">
+<img src="assets/screenshot.webp" alt="Bittivirta Logo" width="100%" style="border-radius:15px;">
 
 ## Running the script
 
