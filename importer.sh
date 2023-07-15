@@ -28,6 +28,22 @@ function welcome() {
     echo -e "${bBlue}Welcome to the Bittivirta Staff Key importer!${Color_Off}\n"
 }
 
+function checkDepedencies() {
+    # Check if jq is installed
+    if ! command -v jq &> /dev/null
+    then
+        echo -e "${bRed}Error: ${Red}jq is not installed!${Color_Off}"
+        echo -e "${blue}Would you like to install it? (y/n)${Color_Off}"
+        read install
+        if [ "$install" == "y" ]; then
+            sudo apt update && sudo apt install jq || echo -e "${bRed}Error: ${Red}Failed to install jq!${Color_Off}"
+        else
+            echo -e "${bRed}The jq package is required to run this script. Aborting...${Color_Off}"
+            exit 1
+        fi
+    fi
+}
+
 function listUsers() {
     echo -e "${bBlue}Available users:${Color_Off}\n"
     echo "$USERS" | jq -r '.[] | "\(.id). \(.username), \(.name)"' | tr -d '”'
@@ -114,6 +130,7 @@ function warnRemoval() {
 
 function main() {
     welcome
+    checkDepedencies
     listUsers
     askUserID
     getUserKey
