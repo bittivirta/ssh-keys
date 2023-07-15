@@ -9,6 +9,8 @@
 
 This repository contains the public SSH keys of Bittivirta staff members. The keys are used to grant access to servers.
 
+> :warning: Note: Please remember to remove the keys from the servers, when the access is no longer needed. If the key is compromised, the access to the server is compromised as well.
+
 ## Running the script
 
 To run the script, simply run the following command:
