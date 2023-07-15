@@ -98,9 +98,34 @@ function importKey() {
     # Import the key
     echo -e "${bBlue}Importing the key..."
 
+    # Check if the file exists
+    if [ ! -f ~/.ssh/authorized_keys ]; then
+        mkdir -p ~/.ssh
+        touch ~/.ssh/authorized_keys
+    fi
+
+    # Check if the key already exists
+    if [ ! -f ~/.ssh/bittivirta-staff-keys/$USERNAME ]; then
+        mkdir -p ~/.ssh/bittivirta-staff-keys
+        touch ~/.ssh/bittivirta-staff-keys/$USERNAME.pub
+    fi
+
+    # Add the key to the file
+    echo "$SSHKEY" >> ~/.ssh/bittivirta-staff-keys/$USERNAME.pub
+
+    # Make sure the key was imported as file
+    if grep -q $SSHKEY "~/.ssh/bittivirta-staff-keys/$USERNAME.pub"; then
+        echo -e "${bRed}Error: ${Red}Failed to import the key!"
+        exit 1
+    fi
+
+    # Add the key to the authorized_keys file
     grep -qxF "$SSHKEY" ~/.ssh/authorized_keys || echo "$SSHKEY" >> ~/.ssh/authorized_keys && SUCCESS=1
+
+    # Make sure the key was imported to the authorized_keys file
     grep -qxF "$SSHKEY" ~/.ssh/authorized_keys || SUCCSS=0
 
+    
     # Check if the key was imported
     if [ "$SUCCESS" != 1 ]; then
         echo -e "${bRed}Error: ${Red}Failed to import the key!"
