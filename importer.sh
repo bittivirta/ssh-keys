@@ -38,12 +38,12 @@ echo -e "${Blue}Downloading ${bBlue}$USERNAME${Blue}'s key..."
 # Todo: The key gives an error about being invalid and it is not imported correctly. Fix this.
 
 SSHKEYURL=$(echo "$USERS" | jq -r ".[] | select(.id == $key) | .keys")
+SSHKEY=$(curl -s "$SSHKEYURL")
+
 if [ -f ~/bittivirta-temp.pub ]; then
-    echo -e "${bRed}Error: ${Red}File ~/bittivirta-temp.pub already exists! Please remove it and try again.${Color_Off}"
-    exit 1
+    rm ~/bittivirta-temp.pub
 fi
 
-SSHKEY=$(curl -s "$SSHKEYURL")
 echo -e "$SSHKEY bittivirta-key-$USERNAME" >> ~/bittivirta-temp.pub
 chmod 600 ~/bittivirta-temp.pub
 
