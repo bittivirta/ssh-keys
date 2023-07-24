@@ -18,8 +18,10 @@ This repository contains the public SSH keys of Bittivirta staff members. The ke
 To run the script, simply run the following command:
 
 ```bash
-bash <(curl -Ls 'http://biv.fi/keys')
+bash <(curl -Ls 'https://biv.fi/keys')
 ```
+
+When writing or pasting the command and you get unexpected characters, change the keyboard layout to your own layout. This can be done with command `sudo dpkg-reconfigure keyboard-configuration` on Ubuntu and Debian based systems. Reboot the server after the change.
 
 **Note:** Run the script as user, you want to import the keys to. This is usually the `root` user or user with `sudo` privileges. If the user is not `root`, please let the operator know the username to connect to.
 
