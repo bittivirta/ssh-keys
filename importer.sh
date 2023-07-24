@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Color Variables
-Color_Off='\033[0m'       # Text Reset
+Reset='\033[0m'       # Text Reset
 Red='\033[0;31m'          # Red
 Blue='\033[0;34m'         # Blue
 Green='\033[0;32m'        # Green
@@ -13,7 +13,7 @@ bGreen='\033[1;32m'       # Bold Green
 USERS=$(curl -s https://raw.githubusercontent.com/bittivirta/ssh-keys/main/users.json)
 
 function welcome() {
-    echo -e "${bBlue}Welcome to the Bittivirta Staff Key importer!${Color_Off}\n"
+    echo -e "${bBlue}Welcome to the Bittivirta Staff Key importer!\n"
 }
 
 function checkDepedencies() {
@@ -21,7 +21,7 @@ function checkDepedencies() {
     if ! command -v jq &> /dev/null
     then
         echo -e "${bRed}Error: ${Red}jq is not installed!"
-        echo -e "${blue}Would you like to install it? (y/n)"
+        echo -e "${blue}Would you like to install it? (y/n):${Reset} "
         read install
         if [ "$install" == "y" ]; then
             sudo apt update && sudo apt install jq || echo -e "${bRed}Error: ${Red}Failed to install jq!"
@@ -33,13 +33,13 @@ function checkDepedencies() {
 }
 
 function listUsers() {
-    echo -e "${bBlue}Available users:${Color_Off}\n"
+    echo -e "${bBlue}Available users:\n"
     echo "$USERS" | jq -r '.[] | "\(.id). \(.username), \(.name)"' | tr -d '”'
 }
 
 function askUserID() {
     echo -e "\n"
-    echo -ne "${Blue}Enter the user ID to import:${Color_Off} "
+    echo -ne "${Blue}Enter the user ID to import: ${Reset}"
     read -r key
     KEY=$key
 }
@@ -83,8 +83,8 @@ function getUserKey() {
 }
 
 function askConfirmation() {
-    echo -e "${Blue}The key will be imported to the current user's authorized_keys file (~/.ssh/authorized_keys).${Color_Off}\n"
-    echo -ne "${bBlue}Continue? (y/n)${Color_Off} "
+    echo -e "${Blue}The key will be imported to the current user's authorized_keys file (~/.ssh/authorized_keys).\n"
+    echo -ne "${bBlue}Continue? (y/n) ${Reset}"
     read confirm
 
     if [ "$confirm" != "y" ]; then
@@ -176,3 +176,4 @@ function main() {
     warnRemoval
 }
 main "$@"
+echo -e "${Reset}"
